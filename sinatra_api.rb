@@ -65,7 +65,7 @@ namespace '/api/v1' do
       begin
         JSON.parse(request.body.read)
       rescue
-        halt 400, { message:'Invalid JSON' }.to_json
+        halt 400, { message: 'Invalid JSON' }.to_json 
       end
     end
   end
@@ -82,7 +82,7 @@ namespace '/api/v1' do
 
   get '/books/:id' do |id|
     book = Book.where(id: id).first
-    halt(404, { message:'Book Not Found'}.to_json) unless book
+    halt(404, { message:'Book Not Found' }.to_json) unless book
     BookSerializer.new(book).to_json
   end
 
@@ -95,5 +95,22 @@ namespace '/api/v1' do
       status 422
       body BookSerializer.new(book).to_json
     end
+  end
+
+  patch '/books/:id' do |id|
+    book = Book.where(id: id).first
+    halt(404, { message:'Book Not Found'}.to_json) unless book 
+    if book.update_attributes(json_params)
+      BookSerializer.new(book).to_json
+    else
+      status 422
+      body BookSerializer.new(book).to_json
+    end
+  end
+
+  delete '/books/:id' do |id|
+    book = Book.where(id: id).first
+    book.destroy if book
+    status 204
   end
 end
